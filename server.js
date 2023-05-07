@@ -4,6 +4,8 @@ const express = require("express");
 
 const app = express();
 
+const data = require('./Movie-Data/data.json');
+
 app.use(express.json());
 
 
@@ -15,10 +17,10 @@ app.get("/", (req, res) => {
   }
 
   const movie = new Movie(
-    "Spider-Man: No Way Home",
-    "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
-    "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man."
-  );
+    data.title, 
+    data.poster_path, 
+    data.overview
+    );
   res.json(movie);
 });
 
