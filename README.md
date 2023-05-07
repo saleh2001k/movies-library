@@ -1,4 +1,4 @@
-# movies-library v-1.0
+# movies-library v-1.1
 
 **Author Name**: Saleh Al-Mashni
 
