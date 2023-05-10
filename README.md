@@ -1,4 +1,6 @@
-# movies-library v-1.1
+
+# movies-library v-1.2
+
 
 **Author Name**: Saleh Al-Mashni
 
@@ -7,7 +9,6 @@
 
 ## Overview
 This is a simple Node.js server that provides movie data from an external API. It exposes two routes, `/trending` and `/search`, to retrieve trending movies and search for movies by name, respectively.
-
 
 ## Getting Started:
 
@@ -20,22 +21,63 @@ This is a simple Node.js server that provides movie data from an external API. I
 5. Create a `.env` file in the root directory of your project and set the following environment variables:
    - `URL` - The base URL of the movie API.
    - `APIKey` - Your API key for accessing the movie API.
-6. Start the application by running `node index.js` in the command line. The console should output a message indicating that the server is listening on a specific port.
+   - `PORT` - The port number on which the server will listen (e.g., 3000).
+6. Start the application by running `node index.js` in the command line. The console should output a message indicating that the server is listening on the specified port.
 7. Open a web browser and navigate to `http://localhost:<port>/trending` or `http://localhost:<port>/search?query=<query>` to access the movie routes.
-## Project Features
-## Routes
 
-### GET /trending
+## Project Features
+
+### Routes
+
+#### GET /trending
 
 Returns a list of trending movies.
 
-### GET /search
+To test this route, open a web browser and navigate to `http://localhost:<port>/trending`. You should see a JSON response containing the list of trending movies.
+
+![WRRC](./assets/Capture1.PNG)
+
+
+#### GET /search
 
 Query Parameters:
 - `query` (required): The search query to find movies by name.
 
 Returns a list of movies that match the search query.
 
+To test this route, open a web browser and navigate to `http://localhost:<port>/search?query=<query>`, replacing `<query>` with the movie name you want to search for. You should see a JSON response containing the list of movies that match the search query.
+
+#### POST /addMovie
+
+Adds a movie to the database along with personal comments.
+
+To test this route, you can use the `curl` command in the command line:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+  "title": "Example Movie",
+  "release_date": "2023-05-10",
+  "poster_path": "https://example.com/poster.jpg",
+  "overview": "This is an example movie.",
+  "comments": "This is my personal comment about the movie."
+}' http://localhost:<port>/addMovie
+```
+
+Make sure to replace <port> with the actual port number on which the server is running. After executing the curl command, you should receive a JSON response containing the added movie details.you should get this message after runnig it:
+```bash
+{"id":3,"title":"Example Movie","release_date":"2023-05-09T21:00:00.000Z","poster_path":"https://example.com/poster.jpg","overview":"This is an example movie.","comments":"This is my personal comment about the movie."} 
+```
+Or in the `schema.sql` file by adding
+```bash
+INSERT INTO movies (title, release_date, poster_path, overview, comments)
+VALUES ('Example Movie', '2023-05-10', 'https://example.com/poster.jpg', 'This is an example movie.', 'This is my personal comment about the movie.');
+```
+
 ## Error Handling
 
 The server includes basic error handling middleware to handle 404 and 500 errors. If a route is not found, a JSON response with a 404 status code will be returned. If an internal server error occurs, a JSON response with a 500 status code will be returned.
+
+## Database
+
+The server uses a PostgreSQL database to store movie data. The database connection URL should be provided in the `.env` file using the `DATABASE_URL` environment variable. Make sure to set up the database and update the schema using the provided `schema.sql` file before running the server.
+
