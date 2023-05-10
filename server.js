@@ -1,24 +1,24 @@
 "use strict";
 
-
-require("dotenv").config();
-const express = require("express");
-const axios = require("axios");
+require('dotenv').config();
+const express = require('express');
+const axios = require('axios');
+const { Pool } = require('pg');
 
 const app = express();
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 app.use(express.json());
 // ------------------ trending  ------------------ \\
-app.get("/trending", async (req, res, next) => {
+app.get('/trending', async (req, res, next) => {
   try {
-    const response = await axios.get(
-      `${process.env.URL}/trending/movie/week`,
-      {
-        params: {
-          api_key: process.env.APIKey,
-        },
-      }
-    );
+    const response = await axios.get(`${process.env.URL}/trending/movie/week`, {
+      params: {
+        api_key: process.env.APIKey,
+      },
+    });
 
     const movies = response.data.results;
     const formattedMovies = movies.map((movie) => ({
@@ -106,6 +106,40 @@ app.get("/upcoming", async (req, res, next) => {
     next(error);
   }
 });
+
+  // ------------------ add movie ------------------ \\
+
+app.post('/addMovie', async (req, res, next) => {
+  try {
+    const { title, release_date, poster_path, overview, comments } = req.body;
+
+    const query =
+      'INSERT INTO movies (title, release_date, poster_path, overview, comments) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    const values = [title, release_date, poster_path, overview, comments];
+
+    const result = await pool.query(query, values);
+    const insertedMovie = result.rows[0];
+
+    res.json(insertedMovie);
+  } catch (error) {
+    next(error);
+  }
+});
+
+//---------------- get movie -----------------\\
+
+app.get('/getMovies', async (req, res, next) => {
+  try {
+    const query = 'SELECT * FROM movies';
+    const result = await pool.query(query);
+    const movies = result.rows;
+    res.json(movies);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 // ------------------ Error handling ------------------ \\
 
