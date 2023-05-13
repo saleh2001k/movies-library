@@ -73,6 +73,31 @@ INSERT INTO movies (title, release_date, poster_path, overview, comments)
 VALUES ('Example Movie', '2023-05-10', 'https://example.com/poster.jpg', 'This is an example movie.', 'This is my personal comment about the movie.');
 ```
 
+
+#### DELETE /delete/:id
+
+Deletes a specific movie from the database.
+
+To test this route, open a web browser and navigate to `http://localhost:<port>/delete/{movieId}`, replacing `{movieId}` with the ID of the movie you want to delete. You should receive a JSON response indicating whether the deletion was successful or not.
+
+#### GET /getMovie/:id
+
+Returns a specific movie from the database.
+
+To test this route, open a web browser and navigate to `http://localhost:<port>/getMovie/{movieId}`, replacing `{movieId}` with the ID of the movie you want to retrieve. You should see a JSON response containing the details of the specific movie.
+
+#### PUT /update/:id
+
+Updates the comments for a specific movie in the database.
+
+To test this route, you can use the `curl` command in the command line:
+
+```bash
+curl -X PUT -H "Content-Type: application/json" -d '{
+  "comments": "Updated comments for the movie."
+} http://localhost:<port>/update/{movieId}
+```
+
 ## Error Handling
 
 The server includes basic error handling middleware to handle 404 and 500 errors. If a route is not found, a JSON response with a 404 status code will be returned. If an internal server error occurs, a JSON response with a 500 status code will be returned.

@@ -1,9 +1,9 @@
 "use strict";
 
-require('dotenv').config();
-const express = require('express');
-const axios = require('axios');
-const { Pool } = require('pg');
+require("dotenv").config();
+const express = require("express");
+const axios = require("axios");
+const { Pool } = require("pg");
 
 const app = express();
 const pool = new Pool({
@@ -12,7 +12,7 @@ const pool = new Pool({
 
 app.use(express.json());
 // ------------------ trending  ------------------ \\
-app.get('/trending', async (req, res, next) => {
+app.get("/trending", async (req, res, next) => {
   try {
     const response = await axios.get(`${process.env.URL}/trending/movie/week`, {
       params: {
@@ -107,14 +107,14 @@ app.get("/upcoming", async (req, res, next) => {
   }
 });
 
-  // ------------------ add movie ------------------ \\
+// ------------------ add movie ------------------ \\
 
-app.post('/addMovie', async (req, res, next) => {
+app.post("/addMovie", async (req, res, next) => {
   try {
     const { title, release_date, poster_path, overview, comments } = req.body;
 
     const query =
-      'INSERT INTO movies (title, release_date, poster_path, overview, comments) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+      "INSERT INTO movies (title, release_date, poster_path, overview, comments) VALUES ($1, $2, $3, $4, $5) RETURNING *";
     const values = [title, release_date, poster_path, overview, comments];
 
     const result = await pool.query(query, values);
@@ -128,9 +128,9 @@ app.post('/addMovie', async (req, res, next) => {
 
 //---------------- get movie -----------------\\
 
-app.get('/getMovies', async (req, res, next) => {
+app.get("/getMovies", async (req, res, next) => {
   try {
-    const query = 'SELECT * FROM movies';
+    const query = "SELECT * FROM movies";
     const result = await pool.query(query);
     const movies = result.rows;
     res.json(movies);
@@ -140,6 +140,84 @@ app.get('/getMovies', async (req, res, next) => {
 });
 
 
+// ------------------ Update movie ------------------ \\
+app.put('/update/:id', async (req, res, next) => {
+  try {
+    const movieId = req.params.id;
+    const movie = req.body;
+
+    const query =
+      'UPDATE movies SET title = $1, release_date = $2, poster_path = $3, overview = $4, comments = $5 WHERE id = $6 RETURNING *';
+    const values = [
+      movie.title,
+      movie.release_date,
+      movie.poster_path,
+      movie.overview,
+      movie.comments,
+      movieId,
+    ];
+
+    const result = await pool.query(query, values);
+    const updatedMovie = result.rows[0];
+
+    if (!updatedMovie) {
+      const error = new Error('Movie not found');
+      error.status = 404;
+      throw error;
+    }
+
+    res.json(updatedMovie);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ------------------ Delete movie ------------------ \\
+
+app.delete("/delete/:id", async (req, res, next) => {
+  try {
+    const movieId = req.params.id;
+
+    const query = "DELETE FROM movies WHERE id = $1 RETURNING *";
+    const values = [movieId];
+
+    const result = await pool.query(query, values);
+    const deletedMovie = result.rows[0];
+
+    if (!deletedMovie) {
+      const error = new Error("Movie not found");
+      error.status = 404;
+      throw error;
+    }
+
+    res.json(deletedMovie);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ------------------ Get a specific movie ------------------ \\
+app.get("/getMovie/:id", async (req, res, next) => {
+  try {
+    const movieId = req.params.id;
+
+    const query = "SELECT * FROM movies WHERE id = $1";
+    const values = [movieId];
+
+    const result = await pool.query(query, values);
+    const movie = result.rows[0];
+
+    if (!movie) {
+      const error = new Error("Movie not found");
+      error.status = 404;
+      throw error;
+    }
+
+    res.json(movie);
+  } catch (error) {
+    next(error);
+  }
+});
 
 // ------------------ Error handling ------------------ \\
 
