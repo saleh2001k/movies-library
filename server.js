@@ -1,14 +1,18 @@
-"use strict";
+'use strict';
 
-require("dotenv").config();
-const express = require("express");
-const axios = require("axios");
-const { Pool } = require("pg");
+require('dotenv').config();
+const express = require('express');
+const axios = require('axios');
+const { Pool } = require('pg');
+const cors = require('cors'); // Import the cors package
 
 const app = express();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+app.use(express.json());
+app.use(cors()); 
 
 app.use(express.json());
 // ------------------ trending  ------------------ \\
